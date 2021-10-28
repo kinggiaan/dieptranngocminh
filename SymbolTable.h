@@ -2,19 +2,14 @@
 #define SYMBOLTABLE_H
 #include "main.h"
 
-void insert(Node* node, ){
-    if(root == NULL){
-        this->root = new Node;
-    }
-    else{
-        pWalk = root;
-        while(pWalk != NULL){
-            node->parent = pWalk;
-        } 
-    }
-}
 class SymbolTable
 {
+public:
+    class Node;
+protected:
+    Node* root;
+public:
+    SymbolTable(): root(NULL){};
 public:
     class Node
     {
@@ -24,7 +19,7 @@ public:
         Node* parent;
         string name;
         string type;
-        string state;
+        string stat;
         int level;
     public:
         Node()
@@ -37,7 +32,7 @@ public:
             right = NULL;
             parent = NULL;
         }    
-        Node(string name, int type, string stat, int level, Node* parent : name(name), type(type), stat(stat), level(NULL), left(NULL), right(NULL), parent(parent)){
+        Node(string name, string type, string stat, int level, Node* parent) : name(name), type(type), stat(stat), level(NULL), left(NULL), right(NULL), parent(parent){}
             string getName(){
                 return this->name;
             }
@@ -50,15 +45,9 @@ public:
             int getLevel(){
                 return this->level;
             }
-        };
-    }
-protected:
-    Node* root;
+    };
+
 public:
-    SymbolTable(): root(NULL);
-public:
-       
-    public:
     SymbolTable() {}
     void run(string filename);
     int isFistKeyHigher(Node* a, Node* b){
@@ -70,5 +59,31 @@ public:
             else return 3; // a = b
         }
     }
+    void insert(Node* node, bool& redeclared, int& num_comp, int& num_splay){
+    if(this->root == NULL){
+        this->root = new Node(node->name, node->type, node->stat, node->level,NULL);
+
+    }
+    else{
+        Node* pWalk = this->root;
+        while(pWalk != NULL){
+            node->parent = pWalk;
+            if(isFistKeyHigher(node, pWalk) == 1){
+                pWalk = pWalk->right;
+            }
+            else if(isFistKeyHigher(node, pWalk) == 2){
+                pWalk = pWalk->left;
+            }
+            else redeclared = true;
+        } 
+        if(isFistKeyHigher(node, node->parent) == 1){
+            node->parent->right = new Node(node->name, node->type, node->stat, node->level, node->parent);
+        }
+        else if(isFistKeyHigher(node, node->parent) == 2){
+            node->parent->left = new Node(node->name, node->type, node->stat, node->level, node->parent);
+        }
+    }
+}
 };
+
 #endif
